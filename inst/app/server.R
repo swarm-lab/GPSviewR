@@ -1,3 +1,5 @@
+options(shiny.maxRequestSize = 10 * 1024 ^ 2)
+
 function(input, output, session) {
 
   ### Reactive values ###
@@ -22,13 +24,18 @@ function(input, output, session) {
 
       if (nrow(files) > 0) {
         for (i in 1:nrow(files)) {
-          tmp <- read.csv(files[i, ]$datapath, stringsAsFactors = FALSE)
+          tmp <- read.csv(files[i, ]$datapath, stringsAsFactors = FALSE) %>%
+            dplyr::select(1:4) %>%
+            dplyr::rename("Date" = V1,
+                          "Time" = V2,
+                          "Longitude" = V3,
+                          "Latitude" = V4)
           if (all(c("Date", "Time", "Longitude", "Latitude") %in% names(tmp))) {
             tmp$Time[tmp$Time == "0:00:00"] <- "0:00:01"
             tmp <- dplyr::mutate(tmp, name = files[i, ]$name) %>%
-              dplyr::mutate(DateTime = lubridate::dmy_hms(paste(Date, Time)))
+              dplyr::mutate(DateTime = lubridate::ymd_hms(paste(Date, Time)))
             dat <<- rbind(dat, tmp)
-            col <- 8 - length(unique(dat$name)) %% 8
+            col <- 18 - length(unique(dat$name)) %% 18
             proxy %>% leaflet::addPolylines(lng = tmp$Longitude, lat = tmp$Latitude,
                                             weight = 2, group = tmp$name[1],
                                             color = cbf[col], opacity = 0.5) %>%
@@ -109,15 +116,16 @@ function(input, output, session) {
     react$newTrack
     if (!is.null(dat)) {
       tmp <- dplyr::filter(dat, DateTime <= input$timeSlider &
-                             DateTime > input$timeSlider - 60)
+                             DateTime > input$timeSlider - (input$tailLength + 1))
       tracks <- unique(tmp$name)
       for (i in 1:length(tracks)) {
         idx <- tmp$name == tracks[i]
-        col <- 8 - i %% 8
+        col <- 18 - i %% 18
         proxy %>% leaflet::addPolylines(lng = tmp$Longitude[idx],
                                         lat = tmp$Latitude[idx],
                                         layerId = paste0("id", i),
-                                        color = cbf[col], opacity = 1)
+                                        color = cbf[col], opacity = 1,
+                                        smoothFactor = 0)
       }
     }
   })
