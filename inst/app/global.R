@@ -6,3 +6,5 @@ library(RColorBrewer)
 
 dat <- NULL
 cbf <- RColorBrewer::brewer.pal(8, "Accent")
+currentTime <- NULL
+proxy <- NULL
