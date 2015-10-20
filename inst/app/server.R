@@ -24,7 +24,8 @@ function(input, output, session) {
 
       if (nrow(files) > 0) {
         for (i in 1:nrow(files)) {
-          tmp <- read.csv(files[i, ]$datapath, stringsAsFactors = FALSE) %>%
+          # tmp <- read.csv(files[i, ]$datapath, stringsAsFactors = FALSE) %>%
+          tmp <- fread(files[i, ]$datapath) %>%
             dplyr::select(1:4) %>%
             dplyr::rename("Date" = V1,
                           "Time" = V2,
@@ -115,16 +116,16 @@ function(input, output, session) {
   observe({
     react$newTrack
     if (!is.null(dat)) {
-      tmp <- dplyr::filter(dat, DateTime <= input$timeSlider &
-                             DateTime > input$timeSlider - (input$tailLength + 1))
+      tmp <- dat[DateTime <= input$timeSlider &
+                   DateTime > input$timeSlider - (input$tailLength + 1)]
+
       tracks <- unique(tmp$name)
+      idx <- paste0("id", 1:length(tracks))
       for (i in 1:length(tracks)) {
-        idx <- tmp$name == tracks[i]
-        col <- 18 - i %% 18
-        proxy %>% leaflet::addPolylines(lng = tmp$Longitude[idx],
-                                        lat = tmp$Latitude[idx],
-                                        layerId = paste0("id", i),
-                                        color = cbf[col], opacity = 1,
+        proxy %>% leaflet::addPolylines(lng = tmp[name == tracks[i]]$Longitude,
+                                        lat = tmp[name == tracks[i]]$Latitude,
+                                        layerId = idx[i],
+                                        color = cbf[18 - i %% 18], opacity = 1,
                                         smoothFactor = 0)
       }
     }
