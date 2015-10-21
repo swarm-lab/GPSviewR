@@ -8,7 +8,10 @@ function(input, output, session) {
 
   ### Map logic ###
   output$map <- leaflet::renderLeaflet({
-    leaflet() %>% addProviderTiles("Esri.WorldImagery") %>%
+    leaflet() %>%
+      addProviderTiles("Esri.WorldImagery",
+                       options = providerTileOptions(maxNativeZoom = 17,
+                                                     maxZoom = 19)) %>%
       fitBounds(15.707703, -22.454663, 15.820656, -22.352775)
   })
   ### ###
