@@ -12,7 +12,7 @@ function(input, output, session) {
       addProviderTiles("Esri.WorldImagery",
                        options = providerTileOptions(maxNativeZoom = 17,
                                                      maxZoom = 19)) %>%
-      fitBounds(15.707703, -22.454663, 15.820656, -22.352775)
+      setView(lng = 15.76418, lat = -22.40372, zoom = 12)
   })
   ### ###
 
@@ -42,7 +42,7 @@ function(input, output, session) {
             col <- 18 - length(unique(dat$name)) %% 18
             proxy %>% leaflet::addPolylines(lng = tmp$Longitude, lat = tmp$Latitude,
                                             weight = 2, group = tmp$name[1],
-                                            color = cbf[col], opacity = 0.5) %>%
+                                            color = cbf[col], opacity = 1) %>%
               leaflet::hideGroup(tmp$name[1])
           }
         }

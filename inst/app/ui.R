@@ -1,5 +1,7 @@
 bootstrapPage(
-  tags$style(type = "text/css", "html, body {width:100%; height:100%; background-color:#F1F1F1;}"),
+  tags$head(
+    tags$link(rel = "stylesheet", type = "text/css", href = "custom.css")
+  ),
 
   leaflet::leafletOutput("map", width = "80%", height = "100%"),
 
@@ -7,9 +9,9 @@ bootstrapPage(
                 fileInput("gpsData", "Add tracks", multiple = TRUE, accept = c("text/csv")),
                 tags$hr(),
                 checkboxGroupInput("tracks", "Display tracks", choices = NULL),
-                actionLink("checkAll", "Check all"),
+                actionLink("checkAll", "Show all"),
                 HTML("&bull;"),
-                actionLink("checkNone", "Check none"),
+                actionLink("checkNone", "Show none"),
                 tags$hr(),
                 sliderInput("tailLength", "Tail length", min = 1, max = 120,
                             value = 60, step = 1, ticks = FALSE, width = "100%")),
