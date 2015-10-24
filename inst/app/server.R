@@ -1,6 +1,6 @@
 options(shiny.maxRequestSize = 10 * 1024 ^ 2)
 
-function(input, output, session) {
+shinyServer(function(input, output, session) {
 
   ### Reactive values ###
   react <- reactiveValues(newTrack = 0)
@@ -42,7 +42,8 @@ function(input, output, session) {
             col <- 18 - length(unique(dat$name)) %% 18
             proxy %>% leaflet::addPolylines(lng = tmp$Longitude, lat = tmp$Latitude,
                                             weight = 2, group = tmp$name[1],
-                                            color = cbf[col], opacity = 1) %>%
+                                            color = cbf[col], opacity = 1,
+                                            popup = tmp$name[1]) %>%
               leaflet::hideGroup(tmp$name[1])
           }
         }
@@ -127,13 +128,11 @@ function(input, output, session) {
       for (i in 1:length(tracks)) {
         proxy %>% leaflet::addPolylines(lng = tmp[name == tracks[i]]$Longitude,
                                         lat = tmp[name == tracks[i]]$Latitude,
-                                        layerId = idx[i],
+                                        layerId = idx[i], popup = tracks[i],
                                         color = cbf[18 - i %% 18], opacity = 1,
                                         smoothFactor = 0)
       }
     }
   })
   ### ###
-}
-
-
+})
